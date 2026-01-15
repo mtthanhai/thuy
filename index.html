@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🐄 VetCalo - Tính Toán Calo Hàng Ngày</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        * {
+            font-family: 'Nunito', sans-serif;
+        }
+        
+        .gradient-bg {
+            background: linear-gradient(135deg, #1a472a 0%, #2d5a3d 50%, #3d6b4f 100%);
+        }
+        
+        .card-gradient {
+            background: linear-gradient(145deg, #ffffff 0%, #f0fdf4 100%);
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #047857 0%, #065f46 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(5, 150, 105, 0.4);
+        }
+        
+        .input-field {
+            transition: all 0.3s ease;
+        }
+        
+        .input-field:focus {
+            border-color: #059669;
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.2);
+        }
+        
+        .gender-btn {
+            transition: all 0.3s ease;
+        }
+        
+        .gender-btn.active {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            color: white;
+            transform: scale(1.05);
+        }
+        
+        .gender-btn:not(.active):hover {
+            background: #dcfce7;
+        }
+        
+        /* Animated Cow */
+        .cow-container {
+            position: fixed;
+            bottom: 20px;
+            left: -200px;
+            animation: runCow 15s linear infinite;
+            z-index: 1000;
+        }
+        
+        @keyframes runCow {
+            0% { left: -200px; }
+            100% { left: 110%; }
+        }
+        
+        .cow {
+            font-size: 80px;
+            animation: bounce 0.3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes bounce {
+            0% { transform: translateY(0) scaleX(-1); }
+            100% { transform: translateY(-10px) scaleX(-1); }
+        }
+        
+        .dust {
+            position: absolute;
+            bottom: 5px;
+            left: 70px;
+            width: 30px;
+            height: 15px;
+            background: radial-gradient(ellipse, rgba(139, 119, 101, 0.6) 0%, transparent 70%);
+            animation: dustCloud 0.3s ease-in-out infinite alternate;
+        }
+        
+        @keyframes dustCloud {
+            0% { opacity: 0.3; transform: scale(1); }
+            100% { opacity: 0.8; transform: scale(1.5); }
+        }
+        
+        .grass-footer {
+            background: linear-gradient(to top, #166534 0%, #22c55e 50%, transparent 100%);
+            height: 60px;
+        }
+        
+        .result-card {
+            animation: fadeInUp 0.5s ease-out;
+        }
+        
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .pulse-ring {
+            animation: pulse-ring 2s cubic-bezier(0.455, 0.03, 0.515, 0.955) infinite;
+        }
+        
+        @keyframes pulse-ring {
+            0% { transform: scale(0.95); opacity: 1; }
+            50% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(0.95); opacity: 1; }
+        }
+        
+        .floating {
+            animation: floating 3s ease-in-out infinite;
+        }
+        
+        @keyframes floating {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+    </style>
+</head>
+<body class="gradient-bg min-h-screen">
+    <!-- Running Cow Animation -->
+    <div class="cow-container">
+        <div class="cow">🐄</div>
+        <div class="dust"></div>
+    </div>
+    
+    <!-- Header -->
+    <header class="py-6 px-4">
+        <div class="max-w-4xl mx-auto text-center">
+            <div class="flex items-center justify-center gap-3 mb-2">
+                <span class="text-5xl floating">🐄</span>
+                <h1 class="text-4xl md:text-5xl font-extrabold text-white drop-shadow-lg">
+                    VetCalo
+                </h1>
+                <span class="text-5xl floating" style="animation-delay: 0.5s;">🌿</span>
+            </div>
+            <p class="text-emerald-200 text-lg font-medium">
+                Tính Toán Lượng Calo Tiêu Thụ Hàng Ngày
+            </p>
+            <div class="flex justify-center gap-2 mt-3">
+                <span class="text-2xl">🐕</span>
+                <span class="text-2xl">🐈</span>
+                <span class="text-2xl">🐎</span>
+                <span class="text-2xl">🐖</span>
+                <span class="text-2xl">🐑</span>
+            </div>
+        </div>
+    </header>
+    
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 pb-24">
+        <div class="card-gradient rounded-3xl shadow-2xl p-6 md:p-10">
+            <!-- Gender Selection -->
+            <div class="mb-8">
+                <label class="block text-emerald-800 font-bold text-lg mb-4 flex items-center gap-2">
+                    <span>👤</span> Giới Tính
+                </label>
+                <div class="grid grid-cols-2 gap-4">
+                    <button id="maleBtn" onclick="selectGender('male')" 
+                        class="gender-btn active flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border-2 border-emerald-300 font-bold text-lg">
+                        <span class="text-3xl">👨</span>
+                        <span>Nam</span>
+                    </button>
+                    <button id="femaleBtn" onclick="selectGender('female')" 
+                        class="gender-btn flex items-center justify-center gap-3 py-4 px-6 rounded-2xl border-2 border-emerald-300 font-bold text-lg bg-white text-emerald-700">
+                        <span class="text-3xl">👩</span>
+                        <span>Nữ</span>
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Input Fields -->
+            <div class="grid md:grid-cols-3 gap-6 mb-8">
+                <!-- Age -->
+                <div>
+                    <label class="block text-emerald-800 font-bold mb-2 flex items-center gap-2">
+                        <span>🎂</span> Tuổi
+                    </label>
+                    <div class="relative">
+                        <input type="number" id="age" placeholder="25" min="1" max="120"
+                            class="input-field w-full px-4 py-4 rounded-xl border-2 border-emerald-200 focus:outline-none text-lg font-semibold text-emerald-800">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500 font-medium">tuổi</span>
+                    </div>
+                </div>
+                
+                <!-- Height -->
+                <div>
+                    <label class="block text-emerald-800 font-bold mb-2 flex items-center gap-2">
+                        <span>📏</span> Chiều Cao
+                    </label>
+                    <div class="relative">
+                        <input type="number" id="height" placeholder="170" min="50" max="300"
+                            class="input-field w-full px-4 py-4 rounded-xl border-2 border-emerald-200 focus:outline-none text-lg font-semibold text-emerald-800">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500 font-medium">cm</span>
+                    </div>
+                </div>
+                
+                <!-- Weight -->
+                <div>
+                    <label class="block text-emerald-800 font-bold mb-2 flex items-center gap-2">
+                        <span>⚖️</span> Cân Nặng
+                    </label>
+                    <div class="relative">
+                        <input type="number" id="weight" placeholder="65" min="20" max="500"
+                            class="input-field w-full px-4 py-4 rounded-xl border-2 border-emerald-200 focus:outline-none text-lg font-semibold text-emerald-800">
+                        <span class="absolute right-4 top-1/2 -translate-y-1/2 text-emerald-500 font-medium">kg</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Activity Level -->
+            <div class="mb-8">
+                <label class="block text-emerald-800 font-bold text-lg mb-4 flex items-center gap-2">
+                    <span>🏃</span> Mức Độ Hoạt Động
+                </label>
+                <select id="activity" 
+                    class="input-field w-full px-4 py-4 rounded-xl border-2 border-emerald-200 focus:outline-none text-lg font-semibold text-emerald-800 bg-white cursor-pointer">
+                    <option value="1.2">🛋️ Ít vận động (ngồi nhiều, ít hoạt động)</option>
+                    <option value="1.375">🚶 Vận động nhẹ (1-3 ngày/tuần)</option>
+                    <option value="1.55" selected>🏃 Vận động vừa (3-5 ngày/tuần)</option>
+                    <option value="1.725">💪 Vận động nhiều (6-7 ngày/tuần)</option>
+                    <option value="1.9">🔥 Vận động rất nhiều (2 lần/ngày)</option>
+                </select>
+            </div>
+            
+            <!-- Calculate Button -->
+            <button onclick="calculateCalories()" 
+                class="btn-primary w-full py-5 rounded-2xl text-white font-bold text-xl flex items-center justify-center gap-3 shadow-lg">
+                <span class="text-2xl">🧮</span>
+                Tính Toán Calo
+                <span class="text-2xl">🐄</span>
+            </button>
+            
+            <!-- Results -->
+            <div id="results" class="hidden mt-8">
+                <div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-1">
+                    <div class="bg-white rounded-xl p-6">
+                        <h3 class="text-2xl font-bold text-emerald-800 mb-6 text-center flex items-center justify-center gap-2">
+                            <span>📊</span> Kết Quả Của Bạn <span>📊</span>
+                        </h3>
+                        
+                        <div class="grid md:grid-cols-2 gap-6">
+                            <!-- BMR -->
+                            <div class="result-card bg-gradient-to-br from-amber-50 to-orange-100 rounded-2xl p-6 text-center border-2 border-amber-200">
+                                <div class="text-4xl mb-2">🔥</div>
+                                <p class="text-amber-700 font-semibold mb-2">Tỷ Lệ Trao Đổi Chất Cơ Bản (BMR)</p>
+                                <p id="bmrResult" class="text-4xl font-extrabold text-amber-600">0</p>
+                                <p class="text-amber-600 font-medium">calo/ngày</p>
+                            </div>
+                            
+                            <!-- TDEE -->
+                            <div class="result-card bg-gradient-to-br from-emerald-50 to-green-100 rounded-2xl p-6 text-center border-2 border-emerald-300 pulse-ring">
+                                <div class="text-4xl mb-2">⚡</div>
+                                <p class="text-emerald-700 font-semibold mb-2">Tổng Năng Lượng Tiêu Hao (TDEE)</p>
+                                <p id="tdeeResult" class="text-5xl font-extrabold text-emerald-600">0</p>
+                                <p class="text-emerald-600 font-medium">calo/ngày</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Goals -->
+                        <div class="mt-6 grid md:grid-cols-3 gap-4">
+                            <div class="result-card bg-gradient-to-br from-red-50 to-rose-100 rounded-xl p-4 text-center border border-red-200">
+                                <div class="text-2xl mb-1">📉</div>
+                                <p class="text-red-600 font-semibold text-sm">Giảm Cân</p>
+                                <p id="loseWeight" class="text-2xl font-bold text-red-500">0</p>
+                                <p class="text-red-500 text-sm">calo/ngày</p>
+                            </div>
+                            
+                            <div class="result-card bg-gradient-to-br from-blue-50 to-cyan-100 rounded-xl p-4 text-center border border-blue-200">
+                                <div class="text-2xl mb-1">⚖️</div>
+                                <p class="text-blue-600 font-semibold text-sm">Duy Trì</p>
+                                <p id="maintain" class="text-2xl font-bold text-blue-500">0</p>
+                                <p class="text-blue-500 text-sm">calo/ngày</p>
+                            </div>
+                            
+                            <div class="result-card bg-gradient-to-br from-purple-50 to-violet-100 rounded-xl p-4 text-center border border-purple-200">
+                                <div class="text-2xl mb-1">📈</div>
+                                <p class="text-purple-600 font-semibold text-sm">Tăng Cân</p>
+                                <p id="gainWeight" class="text-2xl font-bold text-purple-500">0</p>
+                                <p class="text-purple-500 text-sm">calo/ngày</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Tips -->
+                        <div class="mt-6 bg-emerald-50 rounded-xl p-4 border border-emerald-200">
+                            <p class="text-emerald-700 font-semibold flex items-center gap-2 mb-2">
+                                <span>💡</span> Lời Khuyên Sức Khỏe:
+                            </p>
+                            <p id="healthTip" class="text-emerald-600 text-sm"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Info Cards -->
+        <div class="grid md:grid-cols-3 gap-6 mt-8">
+            <div class="bg-white/20 backdrop-blur rounded-2xl p-6 text-center">
+                <div class="text-4xl mb-3">🥗</div>
+                <h3 class="text-white font-bold text-lg mb-2">Dinh Dưỡng Cân Bằng</h3>
+                <p class="text-emerald-200 text-sm">Kết hợp đủ protein, carbs và chất béo lành mạnh</p>
+            </div>
+            
+            <div class="bg-white/20 backdrop-blur rounded-2xl p-6 text-center">
+                <div class="text-4xl mb-3">💧</div>
+                <h3 class="text-white font-bold text-lg mb-2">Uống Đủ Nước</h3>
+                <p class="text-emerald-200 text-sm">2-3 lít nước mỗi ngày cho cơ thể khỏe mạnh</p>
+            </div>
+            
+            <div class="bg-white/20 backdrop-blur rounded-2xl p-6 text-center">
+                <div class="text-4xl mb-3">😴</div>
+                <h3 class="text-white font-bold text-lg mb-2">Ngủ Đủ Giấc</h3>
+                <p class="text-emerald-200 text-sm">7-8 tiếng mỗi đêm để phục hồi năng lượng</p>
+            </div>
+        </div>
+    </main>
+    
+    <!-- Grass Footer -->
+    <div class="fixed bottom-0 left-0 right-0 grass-footer pointer-events-none"></div>
+    
+    <!-- Footer -->
+    <footer class="fixed bottom-2 left-0 right-0 text-center z-10">
+        <p class="text-emerald-300 text-sm font-medium">
+            🐄 VetCalo © 2024 - Chăm sóc sức khỏe như chăm sóc thú cưng 🐾
+        </p>
+    </footer>
+
+    <script>
+        let selectedGender = 'male';
+        
+        function selectGender(gender) {
+            selectedGender = gender;
+            const maleBtn = document.getElementById('maleBtn');
+            const femaleBtn = document.getElementById('femaleBtn');
+            
+            if (gender === 'male') {
+                maleBtn.classList.add('active');
+                femaleBtn.classList.remove('active');
+            } else {
+                femaleBtn.classList.add('active');
+                maleBtn.classList.remove('active');
+            }
+        }
+        
+        function calculateCalories() {
+            const age = parseFloat(document.getElementById('age').value);
+            const height = parseFloat(document.getElementById('height').value);
+            const weight = parseFloat(document.getElementById('weight').value);
+            const activity = parseFloat(document.getElementById('activity').value);
+            
+            // Validation
+            if (!age || !height || !weight) {
+                alert('🐄 Moo! Vui lòng nhập đầy đủ thông tin!');
+                return;
+            }
+            
+            if (age < 1 || age > 120) {
+                alert('🐄 Tuổi phải từ 1 đến 120!');
+                return;
+            }
+            
+            if (height < 50 || height > 300) {
+                alert('🐄 Chiều cao phải từ 50cm đến 300cm!');
+                return;
+            }
+            
+            if (weight < 20 || weight > 500) {
+                alert('🐄 Cân nặng phải từ 20kg đến 500kg!');
+                return;
+            }
+            
+            // Calculate BMR using Mifflin-St Jeor Equation
+            let bmr;
+            if (selectedGender === 'male') {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) + 5;
+            } else {
+                bmr = (10 * weight) + (6.25 * height) - (5 * age) - 161;
+            }
+            
+            // Calculate TDEE
+            const tdee = bmr * activity;
+            
+            // Calculate goals
+            const loseWeight = tdee - 500;
+            const gainWeight = tdee + 500;
+            
+            // Display results
+            document.getElementById('results').classList.remove('hidden');
+            
+            animateNumber('bmrResult', 0, Math.round(bmr), 1000);
+            animateNumber('tdeeResult', 0, Math.round(tdee), 1000);
+            animateNumber('loseWeight', 0, Math.round(loseWeight), 1000);
+            animateNumber('maintain', 0, Math.round(tdee), 1000);
+            animateNumber('gainWeight', 0, Math.round(gainWeight), 1000);
+            
+            // Health tips
+            const tips = [
+                "Ăn nhiều rau xanh và trái cây tươi mỗi ngày, giống như thú cưng cần thức ăn tự nhiên! 🥬",
+                "Tập thể dục đều đặn giúp tăng cường trao đổi chất. Hãy năng động như một chú bò trên đồng cỏ! 🐄",
+                "Chia nhỏ bữa ăn thành 4-5 bữa/ngày để duy trì năng lượng ổn định! 🍽️",
+                "Protein rất quan trọng để xây dựng cơ bắp. Đừng quên bổ sung đủ protein! 💪",
+                "Hạn chế đồ ăn nhanh và thức uống có đường để giữ sức khỏe tốt! 🚫🍔"
+            ];
+            document.getElementById('healthTip').textContent = tips[Math.floor(Math.random() * tips.length)];
+            
+            // Scroll to results
+            document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+        
+        function animateNumber(elementId, start, end, duration) {
+            const element = document.getElementById(elementId);
+            const range = end - start;
+            const startTime = performance.now();
+            
+            function update(currentTime) {
+                const elapsed = currentTime - startTime;
+                const progress = Math.min(elapsed / duration, 1);
+                
+                // Easing function
+                const easeOut = 1 - Math.pow(1 - progress, 3);
+                const current = Math.round(start + range * easeOut);
+                
+                element.textContent = current.toLocaleString('vi-VN');
+                
+                if (progress < 1) {
+                    requestAnimationFrame(update);
+                }
+            }
+            
+            requestAnimationFrame(update);
+        }
+        
+        // Add some fun interactions
+        document.querySelectorAll('input').forEach(input => {
+            input.addEventListener('focus', function() {
+                this.parentElement.classList.add('scale-105');
+                this.parentElement.style.transition = 'transform 0.3s ease';
+            });
+            
+            input.addEventListener('blur', function() {
+                this.parentElement.classList.remove('scale-105');
+            });
+        });
+    </script>
+</body>
+</html>
